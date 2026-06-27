@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>First Light — 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..700,0..1&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --night:#232A4D;
+    --night-2:#2E3760;
+    --parchment:#EFE3CC;
+    --parchment-2:#E8DAC0;
+    --ink:#2A2620;
+    --gold:#C99A3B;
+    --sage:#6E8B6B;
+    --clay:#C1623D;
+    --rose:#B06A78;
+    --line: rgba(42,38,32,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .display{font-family:'Fraunces', serif;}
+
+  /* ---- Header band ---- */
+  .band{
+    background: linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+    color:#EFE3CC;
+    padding: 28px 20px 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  .band-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+  }
+  .band h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0 0 4px;
+    letter-spacing:0.2px;
+  }
+  .band .motto{
+    font-size:13px;
+    opacity:0.75;
+    font-style:italic;
+    margin:0;
+  }
+  .band .date{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    opacity:0.7;
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  /* ---- First Light arc ---- */
+  .arc-wrap{
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .arc-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    opacity:0.65;
+    margin-top:8px;
+  }
+  .arc-frac{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    margin-top:2px;
+    opacity:0.9;
+  }
+
+  /* ---- Main content ---- */
+  .content{
+    max-width:760px;
+    margin:0 auto;
+    padding: 22px 16px 56px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:16px;
+  }
+  @media (min-width: 680px){
+    .grid{ grid-template-columns: 1fr 1fr; }
+  }
+
+  .card{
+    background:#FBF6EA;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px 18px 16px;
+    box-shadow: 0 1px 0 rgba(42,38,32,0.03);
+  }
+  .card-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:12px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  .card-head .dot{
+    width:9px; height:9px; border-radius:50%; flex-shrink:0;
+  }
+  .card-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0;
+  }
+  .card-head .sub{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    opacity:0.5;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-left:auto;
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 0;
+  }
+  .row + .row{ border-top:1px dashed var(--line); }
+  .row .label{
+    flex:1;
+    font-size:14.5px;
+    line-height:1.3;
+  }
+  .row .meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    opacity:0.55;
+    white-space:nowrap;
+  }
+  .check{
+    width:24px; height:24px;
+    border-radius:7px;
+    border:1.5px solid rgba(42,38,32,0.25);
+    background:transparent;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .check.on{ border-color:transparent; }
+  .check svg{ width:13px; height:13px; opacity:0; transition:opacity 0.15s; }
+  .check.on svg{ opacity:1; }
+
+  .streak{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:2px 7px;
+    border-radius:20px;
+    background:rgba(42,38,32,0.06);
+    white-space:nowrap;
+  }
+
+  .tally{
+    display:flex; gap:5px;
+  }
+  .tally .tick{
+    width:18px; height:18px;
+    border-radius:5px;
+    border:1.5px solid rgba(42,38,32,0.25);
+    cursor:pointer;
+  }
+  .tally .tick.on{ border-color:transparent; }
+
+  .progress-track{
+    flex:1;
+    height:7px;
+    background:rgba(42,38,32,0.08);
+    border-radius:6px;
+    position:relative;
+    cursor:pointer;
+  }
+  .progress-fill{
+    position:absolute; left:0; top:0; bottom:0;
+    border-radius:6px;
+  }
+  .stepper{
+    display:flex; align-items:center; gap:6px;
+  }
+  .stepper button{
+    width:22px; height:22px;
+    border-radius:6px;
+    border:1px solid rgba(42,38,32,0.2);
+    background:#fff;
+    cursor:pointer;
+    font-size:14px;
+    line-height:1;
+    color:var(--ink);
+  }
+
+  input[type=text]{
+    font-family:'Work Sans', sans-serif;
+    font-size:13.5px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px 10px;
+    background:#fff;
+    width:100%;
+  }
+  .add-row{
+    display:flex; gap:8px; margin-top:10px;
+  }
+  .add-row button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    border:none;
+    border-radius:8px;
+    padding:0 12px;
+    cursor:pointer;
+    color:#fff;
+    white-space:nowrap;
+  }
+  .recipe-item, .bday-item{
+    display:flex; align-items:center; gap:10px; padding:6px 0;
+    font-size:13.5px;
+  }
+  .recipe-item .name.done, .bday-item .name{
+    flex:1;
+  }
+  .recipe-item .name.done{ text-decoration:line-through; opacity:0.5; }
+  .small-x{
+    background:none; border:none; cursor:pointer; opacity:0.35; font-size:14px;
+    padding:2px;
+  }
+  .small-x:hover{ opacity:0.8; }
+
+  .footer-note{
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    opacity:0.4;
+    margin-top:30px;
+  }
+  .loading{
+    padding:60px 20px;
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--night);
+    opacity:0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="band">
+  <div class="band-top">
+    <div>
+      <h1>First Light</h1>
+      <p class="motto">Live with faith. Serve with love. Grow with grace.</p>
+    </div>
+    <div class="date mono" id="dateLabel"></div>
+  </div>
+  <div class="arc-wrap">
+    <svg id="arcSvg" width="220" height="120" viewBox="0 0 220 120"></svg>
+    <div class="arc-label">today's light</div>
+    <div class="arc-frac mono" id="arcFrac">0 / 6</div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="app" class="loading">gathering this morning's light…</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'park-2026-goals-v1';
+const COLORS = { light:'#C99A3B', learn:'#6E8B6B', live:'#C1623D', love:'#B06A78' };
+
+function todayStr(d=new Date()){
+  const tz = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+  return tz.toISOString().slice(0,10);
+}
+function monthStr(d=new Date()){ return todayStr(d).slice(0,7); }
+function addDays(dateStr, n){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return todayStr(d);
+}
+function weekDates(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  const dow = (d.getDay()+6)%7; // Mon=0
+  const monday = addDays(dateStr, -dow);
+  return Array.from({length:7}, (_,i)=>addDays(monday,i));
+}
+function isWeekday(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  const dow = d.getDay();
+  return dow>=1 && dow<=5;
+}
+
+function defaultState(){
+  return {
+    dailyLogs: {},
+    templeLog: {},
+    inviteLog: {},
+    gymLog: {},
+    certs: [
+      { id:'c1', name:'Certification #1', progress:0 },
+      { id:'c2', name:'Certification #2', progress:0 }
+    ],
+    recipes: [
+      { id:'r1', name:'Lemon broccoli pasta', done:true }
+    ],
+    birthdayTexts: []
+  };
+}
+
+let state = null;
+
+async function waitForStorage(){
+  let tries = 0;
+  while(!window.storage && tries < 20){
+    await new Promise(r => setTimeout(r, 100));
+    tries++;
+  }
+}
+
+async function loadState(){
+  await waitForStorage();
+  try{
+    const result = await window.storage.get(STORAGE_KEY);
+    if(result && result.value){
+      const parsed = JSON.parse(result.value);
+      state = Object.assign(defaultState(), parsed);
+    } else {
+      state = defaultState();
+    }
+  } catch(e){
+    state = defaultState();
+  }
+  render();
+}
+
+async function saveState(){
+  const payload = JSON.stringify(state);
+  for(let attempt=0; attempt<3; attempt++){
+    try{
+      const result = await window.storage.set(STORAGE_KEY, payload);
+      if(result) return;
+    } catch(e){
+      console.error('Storage set attempt '+(attempt+1)+' failed', e);
+    }
+    await new Promise(r => setTimeout(r, 250 * (attempt+1)));
+  }
+  console.error('Storage set failed after 3 attempts — your latest change may not have saved.');
+}
+
+function getDay(dateStr){
+  if(!state.dailyLogs[dateStr]) state.dailyLogs[dateStr] = {};
+  return state.dailyLogs[dateStr];
+}
+
+function toggleDailyField(field){
+  const t = todayStr();
+  const day = getDay(t);
+  day[field] = !day[field];
+  saveState();
+  render();
+}
+
+function computeStreak(field, weekdayOnly=false){
+  let streak = 0;
+  let cursor = todayStr();
+  const todayDone = !!(state.dailyLogs[cursor] && state.dailyLogs[cursor][field]);
+  if(!todayDone) cursor = addDays(cursor, -1);
+  while(true){
+    if(weekdayOnly && !isWeekday(cursor)){ cursor = addDays(cursor,-1); continue; }
+    const log = state.dailyLogs[cursor];
+    if(log && log[field]){ streak++; cursor = addDays(cursor,-1); }
+    else break;
+  }
+  return streak;
+}
+
+function gymCountThisWeek(){
+  return weekDates(todayStr()).filter(d => state.gymLog[d]).length;
+}
+function toggleGymDay(dateStr){
+  state.gymLog[dateStr] = !state.gymLog[dateStr];
+  saveState(); render();
+}
+
+function templeStreakWeeks(){
+  // count consecutive weeks (ending this week) with at least one temple visit
+  let streak = 0;
+  let weekStart = weekDates(todayStr())[0];
+  while(true){
+    const days = weekDates(weekStart);
+    const hit = days.some(d => state.templeLog[d]);
+    const isCurrentWeek = weekStart === weekDates(todayStr())[0];
+    if(hit){ streak++; weekStart = addDays(weekStart, -7); }
+    else if(isCurrentWeek){ weekStart = addDays(weekStart, -7); continue; }
+    else break;
+  }
+  return streak;
+}
+function templeDoneThisWeek(){
+  return weekDates(todayStr()).some(d => state.templeLog[d]);
+}
+function toggleTempleToday(){
+  const t = todayStr();
+  state.templeLog[t] = !state.templeLog[t];
+  saveState(); render();
+}
+
+function inviteDoneThisMonth(){ return !!state.inviteLog[monthStr()]; }
+function toggleInviteThisMonth(){
+  const m = monthStr();
+  state.inviteLog[m] = !state.inviteLog[m];
+  saveState(); render();
+}
+
+function setCertProgress(id, delta){
+  const cert = state.certs.find(c=>c.id===id);
+  cert.progress = Math.max(0, Math.min(100, cert.progress + delta));
+  saveState(); render();
+}
+function renameCert(id, name){
+  const cert = state.certs.find(c=>c.id===id);
+  cert.name = name;
+  saveState();
+}
+
+function addRecipe(name){
+  if(!name.trim()) return;
+  state.recipes.push({ id:'r'+Date.now(), name:name.trim(), done:false });
+  saveState(); render();
+}
+function toggleRecipe(id){
+  const r = state.recipes.find(x=>x.id===id);
+  r.done = !r.done;
+  saveState(); render();
+}
+function removeRecipe(id){
+  state.recipes = state.recipes.filter(x=>x.id!==id);
+  saveState(); render();
+}
+
+function addBirthdayText(name){
+  if(!name.trim()) return;
+  state.birthdayTexts.unshift({ id:'b'+Date.now(), name:name.trim(), date:todayStr() });
+  saveState(); render();
+}
+function removeBirthdayText(id){
+  state.birthdayTexts = state.birthdayTexts.filter(x=>x.id!==id);
+  saveState(); render();
+}
+
+function checkIcon(){
+  return '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function dailyRow(label, field, color, weekdayOnly=false){
+  const day = getDay(todayStr());
+  const on = !!day[field];
+  const streak = computeStreak(field, weekdayOnly);
+  return `
+    <div class="row">
+      <button class="check ${on?'on':''}" style="${on?`background:${color};`:''}" onclick="toggleDailyField('${field}')">${checkIcon()}</button>
+      <div class="label">${label}</div>
+      <div class="streak">${streak>0 ? streak+' day'+(streak===1?'':'s') : '—'}</div>
+    </div>`;
+}
+
+function renderArc(){
+  const day = getDay(todayStr());
+  const fields = ['gospel','wake','nightly','screen','checkin','pray'];
+  const count = fields.filter(f=>day[f]).length;
+  document.getElementById('arcFrac').textContent = `${count} / ${fields.length}`;
+  const frac = count/fields.length;
+
+  const svg = document.getElementById('arcSvg');
+  const cx=110, cy=110, r=90;
+  const startAngle = Math.PI, endAngle = 0; // left to right, semicircle on top
+  function pointAt(t){
+    const a = startAngle + (endAngle-startAngle)*t;
+    return [cx + r*Math.cos(a), cy - Math.abs(r*Math.sin(a))];
+  }
+  const segs = 60;
+  let bgPath = `M ${cx-r} ${cy} `;
+  for(let i=1;i<=segs;i++){ const [x,y]=pointAt(i/segs); bgPath += `L ${x} ${y} `; }
+
+  let fgPath = '';
+  if(frac>0){
+    fgPath = `M ${cx-r} ${cy} `;
+    const fSegs = Math.max(1, Math.round(segs*frac));
+    for(let i=1;i<=fSegs;i++){ const [x,y]=pointAt(i/segs); fgPath += `L ${x} ${y} `; }
+  }
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="dawnGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#232A4D"/>
+        <stop offset="55%" stop-color="#C1623D"/>
+        <stop offset="100%" stop-color="#C99A3B"/>
+      </linearGradient>
+    </defs>
+    <path d="${bgPath}" stroke="rgba(239,227,204,0.18)" stroke-width="10" fill="none" stroke-linecap="round"/>
+    ${fgPath ? `<path d="${fgPath}" stroke="url(#dawnGrad)" stroke-width="10" fill="none" stroke-linecap="round"/>` : ''}
+    <circle cx="${cx}" cy="${cy}" r="3.5" fill="#EFE3CC" opacity="0.5"/>
+  `;
+}
+
+function render(){
+  document.getElementById('dateLabel').textContent = new Date().toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' });
+  renderArc();
+
+  const gymDays = weekDates(todayStr());
+  const gymCount = gymCountThisWeek();
+  const templeWeek = templeDoneThisWeek();
+
+  const app = document.getElementById('app');
+  app.className = '';
+  app.innerHTML = `
+  <div class="grid">
+
+    <!-- LIGHT -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.light}"></span><h2>Light</h2><span class="sub">faith</span></div>
+      ${dailyRow('Daily gospel study', 'gospel', COLORS.light)}
+      <div class="row">
+        <button class="check ${templeWeek?'on':''}" style="${templeWeek?`background:${COLORS.light};`:''}" onclick="toggleTempleToday()">${checkIcon()}</button>
+        <div class="label">Temple this week</div>
+        <div class="streak">${templeStreakWeeks()>0 ? templeStreakWeeks()+' wk streak' : '—'}</div>
+      </div>
+      <div class="row">
+        <button class="check ${inviteDoneThisMonth()?'on':''}" style="${inviteDoneThisMonth()?`background:${COLORS.light};`:''}" onclick="toggleInviteThisMonth()">${checkIcon()}</button>
+        <div class="label">Invite Shannon to temple</div>
+        <div class="meta">this month</div>
+      </div>
+    </div>
+
+    <!-- LEARN -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.learn}"></span><h2>Learn</h2><span class="sub">growth</span></div>
+      ${state.certs.map(c => `
+        <div class="row" style="flex-direction:column; align-items:stretch; gap:6px;">
+          <input type="text" value="${c.name.replace(/"/g,'&quot;')}" onchange="renameCert('${c.id}', this.value)" />
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${c.progress}%; background:${COLORS.learn};"></div>
+            </div>
+            <div class="stepper">
+              <button onclick="setCertProgress('${c.id}',-10)">−</button>
+              <span class="mono" style="font-size:12px; width:34px; text-align:center;">${c.progress}%</span>
+              <button onclick="setCertProgress('${c.id}',10)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--line);">
+        <div class="meta" style="margin-bottom:6px;">recipes learned</div>
+        ${state.recipes.map(r => `
+          <div class="recipe-item">
+            <button class="check ${r.done?'on':''}" style="width:20px;height:20px;${r.done?`background:${COLORS.learn};`:''}" onclick="toggleRecipe('${r.id}')">${checkIcon()}</button>
+            <span class="name ${r.done?'done':''}">${r.name}</span>
+            <button class="small-x" onclick="removeRecipe('${r.id}')">✕</button>
+          </div>
+        `).join('')}
+        <div class="add-row">
+          <input type="text" id="recipeInput" placeholder="Add a recipe…" />
+          <button style="background:${COLORS.learn};" onclick="addRecipe(document.getElementById('recipeInput').value); document.getElementById('recipeInput').value='';">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.live}"></span><h2>Live</h2><span class="sub">routine</span></div>
+      ${dailyRow('Up at 5:30am', 'wake', COLORS.live, true)}
+      ${dailyRow('Nightly routine', 'nightly', COLORS.live)}
+      ${dailyRow('Screen time under 3.5h', 'screen', COLORS.live)}
+      <div class="row">
+        <div class="label">Gym — ${gymCount} / 4 this week</div>
+        <div class="tally">
+          ${gymDays.slice(0,5).map(d => `<div class="tick ${state.gymLog[d]?'on':''}" style="${state.gymLog[d]?`background:${COLORS.live};`:''}" onclick="toggleGymDay('${d}')" title="${d}"></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- LOVE -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.love}"></span><h2>Love</h2><span class="sub">connection</span></div>
+      ${dailyRow('Check-in with Shannon', 'checkin', COLORS.love)}
+      ${dailyRow('Pray for others by name', 'pray', COLORS.love)}
+      <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--line);">
+        <div class="meta" style="margin-bottom:6px;">birthday texts sent · ${state.birthdayTexts.filter(b=>b.date.slice(0,7)===monthStr()).length} this month</div>
+        ${state.birthdayTexts.slice(0,5).map(b => `
+          <div class="bday-item">
+            <span class="name">${b.name}</span>
+            <span class="meta">${b.date.slice(5)}</span>
+            <button class="small-x" onclick="removeBirthdayText('${b.id}')">✕</button>
+          </div>
+        `).join('')}
+        <div class="add-row">
+          <input type="text" id="bdayInput" placeholder="Ward member's name…" />
+          <button style="background:${COLORS.love};" onclick="addBirthdayText(document.getElementById('bdayInput').value); document.getElementById('bdayInput').value='';">Log</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="footer-note">live with faith · serve with love · grow with grace</div>
+  `;
+}
+
+loadState();
+</script>
+</body>
+</html>
