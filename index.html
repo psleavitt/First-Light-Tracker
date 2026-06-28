@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="First Light" />
+<meta name="theme-color" content="#232A4D" />
+<title>First Light — 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..700,0..1&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --night:#232A4D;
+    --night-2:#2E3760;
+    --parchment:#EFE3CC;
+    --ink:#2A2620;
+    --gold:#C99A3B;
+    --sage:#6E8B6B;
+    --clay:#C1623D;
+    --rose:#B06A78;
+    --slate:#6B7585;
+    --line: rgba(42,38,32,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  .band{
+    background: linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+    color:#EFE3CC;
+    padding: 28px 20px 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  .band-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .band h1{ font-family:'Fraunces', serif; font-weight:600; font-size:26px; margin:0 0 4px; letter-spacing:0.2px; }
+  .band .motto{ font-size:13px; opacity:0.75; font-style:italic; margin:0; }
+  .band .date{ font-family:'IBM Plex Mono', monospace; font-size:12px; opacity:0.7; text-align:right; white-space:nowrap; }
+
+  .arc-wrap{ margin-top:18px; display:flex; flex-direction:column; align-items:center; }
+  .arc-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; opacity:0.65; margin-top:8px; }
+  .arc-frac{ font-family:'Fraunces', serif; font-size:15px; margin-top:2px; opacity:0.9; }
+
+  .content{ max-width:760px; margin:0 auto; padding: 22px 16px 56px; }
+  .grid{ display:grid; grid-template-columns: 1fr; gap:16px; }
+  @media (min-width: 680px){ .grid{ grid-template-columns: 1fr 1fr; } }
+
+  .card{ background:#FBF6EA; border:1px solid var(--line); border-radius:14px; padding:18px 18px 16px; box-shadow: 0 1px 0 rgba(42,38,32,0.03); }
+  .card.full{ grid-column: 1 / -1; }
+  .card-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  .card-head .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .card-head h2{ font-family:'Fraunces', serif; font-weight:600; font-size:18px; margin:0; }
+  .card-head .sub{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; opacity:0.5; text-transform:uppercase; letter-spacing:1px; margin-left:auto; }
+
+  .row{ display:flex; align-items:center; gap:12px; padding:9px 0; }
+  .row + .row{ border-top:1px dashed var(--line); }
+  .row .label{ flex:1; font-size:14.5px; line-height:1.3; }
+  .row .meta{ font-family:'IBM Plex Mono', monospace; font-size:11px; opacity:0.55; white-space:nowrap; }
+  .check{ width:24px; height:24px; border-radius:7px; border:1.5px solid rgba(42,38,32,0.25); background:transparent; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition: background 0.15s, border-color 0.15s; }
+  .check.on{ border-color:transparent; }
+  .check svg{ width:13px; height:13px; opacity:0; transition:opacity 0.15s; }
+  .check.on svg{ opacity:1; }
+
+  .streak{ font-family:'IBM Plex Mono', monospace; font-size:11px; padding:2px 7px; border-radius:20px; background:rgba(42,38,32,0.06); white-space:nowrap; }
+
+  .tally{ display:flex; gap:5px; }
+  .tally .tick{ width:18px; height:18px; border-radius:5px; border:1.5px solid rgba(42,38,32,0.25); }
+  .tally .tick.on{ border-color:transparent; }
+
+  .stage-row{ display:flex; gap:5px; margin-top:4px; }
+  .stage-pill{
+    flex:1; text-align:center; font-family:'IBM Plex Mono', monospace; font-size:9.5px;
+    padding:6px 2px; border-radius:7px; border:1.5px solid rgba(42,38,32,0.18);
+    cursor:pointer; text-transform:uppercase; letter-spacing:0.3px; color:var(--ink); opacity:0.55;
+    background:transparent;
+  }
+  .stage-pill.on{ border-color:transparent; color:#fff; opacity:1; }
+
+  input[type=text]{ font-family:'Work Sans', sans-serif; font-size:13.5px; border:1px solid var(--line); border-radius:8px; padding:7px 10px; background:#fff; width:100%; }
+  .add-row{ display:flex; gap:8px; margin-top:10px; }
+  .add-row button, .util-btn{ font-family:'IBM Plex Mono', monospace; font-size:11px; border:none; border-radius:8px; padding:0 12px; height:34px; cursor:pointer; color:#fff; white-space:nowrap; }
+  .util-btn.outline{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+
+  .item-row{ display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13.5px; }
+  .item-row .name{ flex:1; }
+  .item-row .name.done{ text-decoration:line-through; opacity:0.5; }
+  .small-x{ background:none; border:none; cursor:pointer; opacity:0.35; font-size:14px; padding:2px; }
+  .small-x:hover{ opacity:0.8; }
+
+  .summary-stat{ display:flex; align-items:center; justify-content:space-between; padding:7px 0; font-size:13.5px; }
+  .summary-stat + .summary-stat{ border-top:1px dashed var(--line); }
+  .summary-section-label{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin:14px 0 2px; }
+  .summary-section-label:first-child{ margin-top:0; }
+
+  .footer-note{ text-align:center; font-family:'IBM Plex Mono', monospace; font-size:10.5px; opacity:0.4; margin-top:30px; }
+  .loading{ padding:60px 20px; text-align:center; font-family:'IBM Plex Mono', monospace; color:var(--night); opacity:0.6; }
+  .backup-bar{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+
+<div class="band">
+  <div class="band-top">
+    <div>
+      <h1>First Light</h1>
+      <p class="motto">Live with faith. Serve with love. Grow with grace.</p>
+    </div>
+    <div class="date mono" id="dateLabel"></div>
+  </div>
+  <div class="arc-wrap">
+    <svg id="arcSvg" width="220" height="120" viewBox="0 0 220 120"></svg>
+    <div class="arc-label">today's light</div>
+    <div class="arc-frac mono" id="arcFrac">0 / 6</div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="app" class="loading">gathering this morning's light…</div>
+</div>
+
+<input type="file" id="importFile" accept="application/json" style="display:none" />
+
+<script>
+const STORAGE_KEY = 'park-2026-goals-v1';
+const COLORS = { light:'#C99A3B', learn:'#6E8B6B', live:'#C1623D', love:'#B06A78', other:'#6B7585' };
+const STAGES = ['Start','Study','Practice','Exam','Complete'];
+
+function todayStr(d=new Date()){
+  const tz = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+  return tz.toISOString().slice(0,10);
+}
+function monthStr(d=new Date()){ return todayStr(d).slice(0,7); }
+function addDays(dateStr, n){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return todayStr(d);
+}
+function weekDates(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  const dow = (d.getDay()+6)%7;
+  const monday = addDays(dateStr, -dow);
+  return Array.from({length:7}, (_,i)=>addDays(monday,i));
+}
+function isWeekday(dateStr){
+  const dow = new Date(dateStr+'T00:00:00').getDay();
+  return dow>=1 && dow<=5;
+}
+function daysElapsedThisMonth(){
+  const t = new Date();
+  return t.getDate();
+}
+
+function defaultState(){
+  return {
+    dailyLogs: {},
+    templeLog: {},
+    inviteLog: {},
+    gymLog: {},
+    certs: [
+      { id:'c1', name:'Certification #1', stage:0 },
+      { id:'c2', name:'Certification #2', stage:0 }
+    ],
+    recipes: [ { id:'r1', name:'Lemon broccoli pasta', done:true } ],
+    birthdayTexts: [],
+    customGoals: []
+  };
+}
+
+let state = null;
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? Object.assign(defaultState(), JSON.parse(raw)) : defaultState();
+    if(!state.customGoals) state.customGoals = [];
+    state.certs.forEach(c => { if(typeof c.stage !== 'number') c.stage = c.progress ? Math.round(c.progress/25) : 0; });
+  } catch(e){
+    console.error('Could not read local storage', e);
+    state = defaultState();
+  }
+  render();
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error('Could not write to local storage', e); }
+}
+
+function getDay(dateStr){
+  if(!state.dailyLogs[dateStr]) state.dailyLogs[dateStr] = {};
+  return state.dailyLogs[dateStr];
+}
+function toggleDailyField(field){
+  const day = getDay(todayStr());
+  day[field] = !day[field];
+  saveState(); render();
+}
+function computeStreak(field, weekdayOnly=false){
+  let streak = 0;
+  let cursor = todayStr();
+  const todayDone = !!(state.dailyLogs[cursor] && state.dailyLogs[cursor][field]);
+  if(!todayDone) cursor = addDays(cursor, -1);
+  while(true){
+    if(weekdayOnly && !isWeekday(cursor)){ cursor = addDays(cursor,-1); continue; }
+    const log = state.dailyLogs[cursor];
+    if(log && log[field]){ streak++; cursor = addDays(cursor,-1); } else break;
+  }
+  return streak;
+}
+function countFieldThisMonth(field){
+  const m = monthStr();
+  return Object.keys(state.dailyLogs).filter(d => d.slice(0,7)===m && state.dailyLogs[d][field]).length;
+}
+
+function gymCountThisWeek(){ return weekDates(todayStr()).filter(d => state.gymLog[d]).length; }
+function gymCountThisMonth(){
+  const m = monthStr();
+  return Object.keys(state.gymLog).filter(d => d.slice(0,7)===m && state.gymLog[d]).length;
+}
+function toggleGymToday(){ const t=todayStr(); state.gymLog[t] = !state.gymLog[t]; saveState(); render(); }
+
+function templeStreakWeeks(){
+  let streak = 0;
+  let weekStart = weekDates(todayStr())[0];
+  const currentWeekStart = weekStart;
+  while(true){
+    const hit = weekDates(weekStart).some(d => state.templeLog[d]);
+    if(hit){ streak++; weekStart = addDays(weekStart, -7); }
+    else if(weekStart === currentWeekStart){ weekStart = addDays(weekStart, -7); }
+    else break;
+  }
+  return streak;
+}
+function templeDoneThisWeek(){ return weekDates(todayStr()).some(d => state.templeLog[d]); }
+function templeCountThisMonth(){
+  const m = monthStr();
+  return Object.keys(state.templeLog).filter(d => d.slice(0,7)===m && state.templeLog[d]).length;
+}
+function toggleTempleToday(){ const t=todayStr(); state.templeLog[t] = !state.templeLog[t]; saveState(); render(); }
+
+function inviteDoneThisMonth(){ return !!state.inviteLog[monthStr()]; }
+function toggleInviteThisMonth(){ const m=monthStr(); state.inviteLog[m] = !state.inviteLog[m]; saveState(); render(); }
+
+function setCertStage(id, stage){
+  const cert = state.certs.find(c=>c.id===id);
+  cert.stage = Math.max(0, Math.min(STAGES.length-1, stage));
+  saveState(); render();
+}
+function renameCert(id, name){ state.certs.find(c=>c.id===id).name = name; saveState(); }
+
+function addRecipe(name){
+  if(!name.trim()) return;
+  state.recipes.push({ id:'r'+Date.now(), name:name.trim(), done:false });
+  saveState(); render();
+}
+function toggleRecipe(id){ const r=state.recipes.find(x=>x.id===id); r.done=!r.done; saveState(); render(); }
+function removeRecipe(id){ state.recipes = state.recipes.filter(x=>x.id!==id); saveState(); render(); }
+
+function addBirthdayText(name){
+  if(!name.trim()) return;
+  state.birthdayTexts.unshift({ id:'b'+Date.now(), name:name.trim(), date:todayStr() });
+  saveState(); render();
+}
+function removeBirthdayText(id){ state.birthdayTexts = state.birthdayTexts.filter(x=>x.id!==id); saveState(); render(); }
+
+function addCustomGoal(label){
+  if(!label.trim()) return;
+  state.customGoals.push({ id:'g'+Date.now(), label:label.trim() });
+  saveState(); render();
+}
+function removeCustomGoal(id){
+  state.customGoals = state.customGoals.filter(g=>g.id!==id);
+  saveState(); render();
+}
+function toggleCustomGoal(id){ toggleDailyField('custom_'+id); }
+
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'first-light-backup-' + todayStr() + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importBackup(file){
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(!confirm('This will replace your current tracker data with the contents of this backup file. Continue?')) return;
+      state = Object.assign(defaultState(), parsed);
+      if(!state.customGoals) state.customGoals = [];
+      saveState(); render();
+    } catch(err){
+      alert('That file could not be read as a valid backup.');
+    }
+  };
+  reader.readAsText(file);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('importFile').addEventListener('change', (e) => {
+    if(e.target.files[0]) importBackup(e.target.files[0]);
+    e.target.value = '';
+  });
+});
+
+function checkIcon(){
+  return '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function dailyRow(label, field, color, weekdayOnly=false){
+  const day = getDay(todayStr());
+  const on = !!day[field];
+  const streak = computeStreak(field, weekdayOnly);
+  return `
+    <div class="row">
+      <button class="check ${on?'on':''}" style="${on?`background:${color};`:''}" onclick="toggleDailyField('${field}')">${checkIcon()}</button>
+      <div class="label">${label}</div>
+      <div class="streak">${streak>0 ? streak+' day'+(streak===1?'':'s') : '—'}</div>
+    </div>`;
+}
+
+function renderArc(){
+  const day = getDay(todayStr());
+  const baseFields = ['gospel','wake','nightly','screen','checkin','pray'];
+  const customFields = state.customGoals.map(g => 'custom_'+g.id);
+  const fields = baseFields.concat(customFields);
+  const count = fields.filter(f=>day[f]).length;
+  document.getElementById('arcFrac').textContent = `${count} / ${fields.length}`;
+  const frac = fields.length ? count/fields.length : 0;
+
+  const svg = document.getElementById('arcSvg');
+  const cx=110, cy=110, r=90;
+  function pointAt(t){
+    const a = Math.PI*(1-t);
+    return [cx + r*Math.cos(a), cy - Math.abs(r*Math.sin(a))];
+  }
+  const segs = 60;
+  let bgPath = `M ${cx-r} ${cy} `;
+  for(let i=1;i<=segs;i++){ const [x,y]=pointAt(i/segs); bgPath += `L ${x} ${y} `; }
+  let fgPath = '';
+  if(frac>0){
+    fgPath = `M ${cx-r} ${cy} `;
+    const fSegs = Math.max(1, Math.round(segs*frac));
+    for(let i=1;i<=fSegs;i++){ const [x,y]=pointAt(i/segs); fgPath += `L ${x} ${y} `; }
+  }
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="dawnGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#232A4D"/>
+        <stop offset="55%" stop-color="#C1623D"/>
+        <stop offset="100%" stop-color="#C99A3B"/>
+      </linearGradient>
+    </defs>
+    <path d="${bgPath}" stroke="rgba(239,227,204,0.18)" stroke-width="10" fill="none" stroke-linecap="round"/>
+    ${fgPath ? `<path d="${fgPath}" stroke="url(#dawnGrad)" stroke-width="10" fill="none" stroke-linecap="round"/>` : ''}
+    <circle cx="${cx}" cy="${cy}" r="3.5" fill="#EFE3CC" opacity="0.5"/>
+  `;
+}
+
+function statRow(label, value){
+  return `<div class="summary-stat"><span>${label}</span><span class="mono">${value}</span></div>`;
+}
+
+function render(){
+  document.getElementById('dateLabel').textContent = new Date().toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' });
+  renderArc();
+
+  const templeWeek = templeDoneThisWeek();
+  const gymWeekCount = gymCountThisWeek();
+  const gymToday = !!state.gymLog[todayStr()];
+  const elapsed = daysElapsedThisMonth();
+  const monthLabel = new Date().toLocaleDateString(undefined, { month:'long' });
+
+  const app = document.getElementById('app');
+  app.className = '';
+  app.innerHTML = `
+  <div class="grid">
+
+    <!-- LIGHT -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.light}"></span><h2>Light</h2><span class="sub">faith</span></div>
+      ${dailyRow('Daily gospel study', 'gospel', COLORS.light)}
+      <div class="row">
+        <button class="check ${templeWeek?'on':''}" style="${templeWeek?`background:${COLORS.light};`:''}" onclick="toggleTempleToday()">${checkIcon()}</button>
+        <div class="label">Temple this week</div>
+        <div class="streak">${templeStreakWeeks()>0 ? templeStreakWeeks()+' wk streak' : '—'}</div>
+      </div>
+      <div class="row">
+        <button class="check ${inviteDoneThisMonth()?'on':''}" style="${inviteDoneThisMonth()?`background:${COLORS.light};`:''}" onclick="toggleInviteThisMonth()">${checkIcon()}</button>
+        <div class="label">Monthly Temple Invitation</div>
+        <div class="meta">this month</div>
+      </div>
+    </div>
+
+    <!-- LEARN -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.learn}"></span><h2>Learn</h2><span class="sub">growth</span></div>
+      ${state.certs.map(c => `
+        <div class="row" style="flex-direction:column; align-items:stretch; gap:6px;">
+          <input type="text" value="${c.name.replace(/"/g,'&quot;')}" onchange="renameCert('${c.id}', this.value)" />
+          <div class="stage-row">
+            ${STAGES.map((s,i) => `
+              <div class="stage-pill ${i<=c.stage?'on':''}" style="${i<=c.stage?`background:${COLORS.learn};`:''}" onclick="setCertStage('${c.id}', ${i})">${s}</div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--line);">
+        <div class="meta" style="margin-bottom:6px;">recipes learned</div>
+        ${state.recipes.map(r => `
+          <div class="item-row">
+            <button class="check ${r.done?'on':''}" style="width:20px;height:20px;${r.done?`background:${COLORS.learn};`:''}" onclick="toggleRecipe('${r.id}')">${checkIcon()}</button>
+            <span class="name ${r.done?'done':''}">${r.name}</span>
+            <button class="small-x" onclick="removeRecipe('${r.id}')">✕</button>
+          </div>
+        `).join('')}
+        <div class="add-row">
+          <input type="text" id="recipeInput" placeholder="Add a recipe…" />
+          <button style="background:${COLORS.learn};" onclick="addRecipe(document.getElementById('recipeInput').value); document.getElementById('recipeInput').value='';">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.live}"></span><h2>Live</h2><span class="sub">routine</span></div>
+      ${dailyRow('Up at 5:30am', 'wake', COLORS.live, true)}
+      ${dailyRow('Nightly routine', 'nightly', COLORS.live)}
+      ${dailyRow('Screen time under 3.5h', 'screen', COLORS.live)}
+      <div class="row">
+        <button class="check ${gymToday?'on':''}" style="${gymToday?`background:${COLORS.live};`:''}" onclick="toggleGymToday()">${checkIcon()}</button>
+        <div class="label">Gym today</div>
+        <div class="streak">${gymWeekCount} / 4 this week</div>
+      </div>
+      <div class="row" style="padding-top:0; border-top:none;">
+        <div class="tally">
+          ${[0,1,2,3].map(i => `<div class="tick ${gymWeekCount>i?'on':''}" style="${gymWeekCount>i?`background:${COLORS.live};`:''}"></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- LOVE -->
+    <div class="card">
+      <div class="card-head"><span class="dot" style="background:${COLORS.love}"></span><h2>Love</h2><span class="sub">connection</span></div>
+      ${dailyRow('Nightly Check-In', 'checkin', COLORS.love)}
+      ${dailyRow('Pray for others by name', 'pray', COLORS.love)}
+      <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--line);">
+        <div class="meta" style="margin-bottom:6px;">birthday texts sent · ${state.birthdayTexts.filter(b=>b.date.slice(0,7)===monthStr()).length} this month</div>
+        ${state.birthdayTexts.slice(0,5).map(b => `
+          <div class="item-row">
+            <span class="name">${b.name}</span>
+            <span class="meta">${b.date.slice(5)}</span>
+            <button class="small-x" onclick="removeBirthdayText('${b.id}')">✕</button>
+          </div>
+        `).join('')}
+        <div class="add-row">
+          <input type="text" id="bdayInput" placeholder="Ward member's name…" />
+          <button style="background:${COLORS.love};" onclick="addBirthdayText(document.getElementById('bdayInput').value); document.getElementById('bdayInput').value='';">Log</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER / CUSTOM GOALS -->
+    <div class="card full">
+      <div class="card-head"><span class="dot" style="background:${COLORS.other}"></span><h2>Other Goals</h2><span class="sub">your own</span></div>
+      ${state.customGoals.length === 0 ? '<div class="meta" style="padding:6px 0;">No custom goals yet — add one below.</div>' : ''}
+      ${state.customGoals.map(g => {
+        const day = getDay(todayStr());
+        const field = 'custom_'+g.id;
+        const on = !!day[field];
+        const streak = computeStreak(field);
+        return `
+        <div class="row">
+          <button class="check ${on?'on':''}" style="${on?`background:${COLORS.other};`:''}" onclick="toggleCustomGoal('${g.id}')">${checkIcon()}</button>
+          <div class="label">${g.label}</div>
+          <div class="streak">${streak>0 ? streak+' day'+(streak===1?'':'s') : '—'}</div>
+          <button class="small-x" onclick="removeCustomGoal('${g.id}')">✕</button>
+        </div>`;
+      }).join('')}
+      <div class="add-row">
+        <input type="text" id="goalInput" placeholder="Add a new daily goal…" />
+        <button style="background:${COLORS.other};" onclick="addCustomGoal(document.getElementById('goalInput').value); document.getElementById('goalInput').value='';">Add</button>
+      </div>
+    </div>
+
+    <!-- MONTHLY SUMMARY -->
+    <div class="card full">
+      <div class="card-head"><span class="dot" style="background:${COLORS.night||'#232A4D'}"></span><h2>${monthLabel} so far</h2><span class="sub">day ${elapsed}</span></div>
+
+      <div class="summary-section-label">light</div>
+      ${statRow('Gospel study', countFieldThisMonth('gospel') + ' / ' + elapsed + ' days')}
+      ${statRow('Temple visits', templeCountThisMonth())}
+      ${statRow('Monthly temple invitation', inviteDoneThisMonth() ? 'Done ✓' : 'Not yet')}
+
+      <div class="summary-section-label">learn</div>
+      ${state.certs.map(c => statRow(c.name, STAGES[c.stage])).join('')}
+      ${statRow('Recipes learned (all-time)', state.recipes.filter(r=>r.done).length)}
+
+      <div class="summary-section-label">live</div>
+      ${statRow('Wake at 5:30am', countFieldThisMonth('wake') + ' days')}
+      ${statRow('Nightly routine', countFieldThisMonth('nightly') + ' days')}
+      ${statRow('Screen time under 3.5h', countFieldThisMonth('screen') + ' days')}
+      ${statRow('Gym sessions', gymCountThisMonth())}
+
+      <div class="summary-section-label">love</div>
+      ${statRow('Nightly check-in', countFieldThisMonth('checkin') + ' days')}
+      ${statRow('Prayer for others', countFieldThisMonth('pray') + ' days')}
+      ${statRow('Birthday texts sent', state.birthdayTexts.filter(b=>b.date.slice(0,7)===monthStr()).length)}
+
+      ${state.customGoals.length ? '<div class="summary-section-label">other</div>' : ''}
+      ${state.customGoals.map(g => statRow(g.label, countFieldThisMonth('custom_'+g.id) + ' days')).join('')}
+
+      <div class="backup-bar">
+        <button class="util-btn" style="background:${COLORS.live};" onclick="exportBackup()">Export backup</button>
+        <button class="util-btn outline" onclick="document.getElementById('importFile').click();">Import backup</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="footer-note">live with faith · serve with love · grow with grace</div>
+  `;
+}
+
+loadState();
+</script>
+</body>
+</html>
